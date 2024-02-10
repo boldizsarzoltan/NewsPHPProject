@@ -3,6 +3,7 @@
 namespace App\Database;
 
 use App\Database\Exceptions\DatabaseException;
+use App\Database\Exceptions\MissingDatabaseTypeException;
 use App\Database\Exceptions\UnexpectedDatabaseFailure;
 use App\Database\Exceptions\UnexpectedTransactionFailure;
 
@@ -17,7 +18,7 @@ class DatabaseConnection implements DatabaseConnectionInterface
         $user = (string) getenv('DB_USER');
         $password = (string) getenv('DB_PASSWORD');
         $dsn = "mysql:dbname={$database};host={$host}";
-        $this->pdo = new \PDO($dsn, $user, $password);
+        $this->pdo = $this->getPdo($dsn, $user, $password);
     }
 
     /**
@@ -26,22 +27,19 @@ class DatabaseConnection implements DatabaseConnectionInterface
     public function select(string $sql, array $values = [], array $types = []): array
     {
         $sth = $this->bindValues($sql, $values, $types);
-        if (false === $sth) {
+        $result = $sth->execute($values);
+        if(!$result) {
             throw new UnexpectedDatabaseFailure();
         }
-        $sth->execute($values);
         return $sth->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
      * @inheritDoc
      */
-    public function execute(string $sql, array $values = [], array $types = []): bool|int
+    public function execute(string $sql, array $values = [], array $types = []): bool
     {
         $sth = $this->bindValues($sql, $values, $types);
-        if (false === $sth) {
-            throw new UnexpectedDatabaseFailure();
-        }
         return $sth->execute();
     }
 
@@ -59,10 +57,16 @@ class DatabaseConnection implements DatabaseConnectionInterface
      * @param  array<ParameterTypes> $types
      * @return false|\PDOStatement
      */
-    private function bindValues(string $sql, array $values, array $types): \PDOStatement|false
+    private function bindValues(string $sql, array $values, array $types): \PDOStatement
     {
         $sth = $this->pdo->prepare($sql);
+        if (false === $sth) {
+            throw new UnexpectedDatabaseFailure();
+        }
         foreach ($values as $name => $value) {
+            if(!isset($types[$name])) {
+                throw new MissingDatabaseTypeException();
+            }
             $type = $types[$name]->toPDO();
             $success = $sth->bindValue(
                 $name,
@@ -86,7 +90,6 @@ class DatabaseConnection implements DatabaseConnectionInterface
 
     public function commit(): void
     {
-        $this->pdo->commit();
         if (!$this->pdo->commit()) {
             throw new UnexpectedTransactionFailure();
         }
@@ -94,9 +97,20 @@ class DatabaseConnection implements DatabaseConnectionInterface
 
     public function rollback(): void
     {
-        $this->pdo->rollBack();
         if (!$this->pdo->rollBack()) {
             throw new UnexpectedTransactionFailure();
         }
+    }
+
+    /**
+     * @param string $dsn
+     * @param string $user
+     * @param string $password
+     * @return \PDO
+     * for test purposes
+     */
+    protected function getPdo(string $dsn, string $user, string $password): \PDO
+    {
+        return new \PDO($dsn, $user, $password);
     }
 }
