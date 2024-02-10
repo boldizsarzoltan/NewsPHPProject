@@ -8,6 +8,10 @@ services:
         - '../src/Entity/'
         - '../src/Kernel.php'
         - '../src/Database/DatabaseConnectionInterface.php'
+    Psr\Log\LoggerInterface:
+        class: \Monolog\Logger
+        arguments:
+            $name: 'logger'
     App\Database\DatabaseConnectionInterface:
         class:
             App\Database\DatabaseConnection
@@ -17,6 +21,7 @@ services:
         arguments:
             $databaseConnection: '@App\Database\DatabaseConnectionInterface'
             $commentBuilder: '@App\Repositories\Builder\CommentBuilder'
+            $logger: '@Psr\Log\LoggerInterface'
     App\Repositories\NewsRepository:
         class:
             App\Repositories\NewsRepository
@@ -24,4 +29,5 @@ services:
             $databaseConnection: '@App\Database\DatabaseConnectionInterface'
             $commentManager: '@App\Repositories\CommentRepository'
             $newsBuilder: '@App\Repositories\Builder\NewsBuilder'
+            $logger: '@Psr\Log\LoggerInterface'
 

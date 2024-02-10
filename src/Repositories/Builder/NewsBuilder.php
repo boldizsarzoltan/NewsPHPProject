@@ -51,6 +51,10 @@ class NewsBuilder
         );
     }
 
+    /**
+     * @return News
+     * @throws InvalidNewsExceception
+     */
     public function buildExisting(): News
     {
         if(

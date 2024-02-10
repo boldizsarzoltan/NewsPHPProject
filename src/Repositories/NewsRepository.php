@@ -6,13 +6,16 @@ use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
 use App\Entity\News;
 use App\Repositories\Builder\NewsBuilder;
+use App\Repositories\Exceptions\InvalidNewsExceception;
+use Psr\Log\LoggerInterface;
 
 final class NewsRepository
 {
     public function __construct(
         private readonly DatabaseConnectionInterface $databaseConnection,
         private readonly CommentRepository $commentManager,
-        private readonly NewsBuilder $newsBuilder
+        private readonly NewsBuilder $newsBuilder,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -25,12 +28,18 @@ final class NewsRepository
         $rows = $this->databaseConnection->select('SELECT * FROM `news`');
         $news = [];
         foreach ($rows as $row) {
-            $news[] = $this->newsBuilder
-                ->setBody($row["body"])
-                ->setCreatedAt($row["created_at"])
-                ->setTitle($row["title"])
-                ->setId($row["id"])
-                ->buildExisting();
+
+            try {
+                $news[] = $this->newsBuilder
+                    ->setBody($row["body"])
+                    ->setCreatedAt($row["created_at"])
+                    ->setTitle($row["title"])
+                    ->setId($row["id"])
+                    ->buildExisting();
+            }
+            catch (InvalidNewsExceception $exception) {
+                $this->logger->error($exception->getMessage());
+            }
         }
 
         return $news;
@@ -65,13 +74,22 @@ final class NewsRepository
      */
     public function deleteNews(int $id): int|bool
     {
-        $comments = $this->commentManager->deleteByNewsId($id);
+        $this->databaseConnection->startTransaction();
+        try {
+            $success = $this->commentManager->deleteByNewsId($id);
 
-        $sql = "DELETE FROM `news` WHERE `id`= :id";
-        return $this->databaseConnection->execute(
-            $sql,
-            ["id" => $id],
-            ["id" => ParameterTypes::TYPE_INT]
-        );
+            $sql = "DELETE FROM `news` WHERE `id`= :id";
+            $this->databaseConnection->execute(
+                $sql,
+                ["id" => $id],
+                ["id" => ParameterTypes::TYPE_INT]
+            );
+            $this->databaseConnection->commit();
+            return true;
+        }
+        catch (\Throwable $throwable) {
+            $this->databaseConnection->rollback();
+            return false;
+        }
     }
 }

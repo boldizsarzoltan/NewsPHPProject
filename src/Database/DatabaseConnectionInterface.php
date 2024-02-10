@@ -21,4 +21,7 @@ interface DatabaseConnectionInterface
     public function execute(string $sql, array $values=[], array $types=[]): bool|int;
 
     public function lastInsertId(): bool|int;
+    public function startTransaction(): bool|int;
+    public function commit(): bool|int;
+    public function rollback(): bool|int;
 }

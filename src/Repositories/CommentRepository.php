@@ -6,13 +6,15 @@ use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
 use App\Repositories\Builder\CommentBuilder;
 use App\Repositories\Exceptions\InvalidCommentExceception;
+use Psr\Log\LoggerInterface;
 
 class CommentRepository
 {
 
     public function __construct(
-        private DatabaseConnectionInterface $databaseConnection,
-        private CommentBuilder $commentBuilder
+        private readonly DatabaseConnectionInterface $databaseConnection,
+        private readonly CommentBuilder $commentBuilder,
+        private readonly LoggerInterface $logger
     ) {
     }
 
@@ -29,7 +31,8 @@ class CommentRepository
                     ->setCreatedAt($row["created_at"])
                     ->setId($row["id"])
                     ->buildExisting();
-            } catch (InvalidCommentExceception) {
+            } catch (InvalidCommentExceception $exceception) {
+                $this->logger->warning($exceception->getMessage());
             }
         }
 
@@ -38,42 +41,62 @@ class CommentRepository
 
     public function addCommentForNews(string $body, int $newsId): bool|string
     {
-        $sql = "INSERT INTO `comment` (`body`, `created_at`, `news_id`) VALUES(:body, :created_at, :news_id)";
-        $currentDateTime = new \DateTimeImmutable();
-        $this->databaseConnection->execute(
-            $sql,
-            [
-                $body,
-                $currentDateTime->format("Y-m-d H:i:s"),
-                $newsId
-            ],
-            [
-                "body" => ParameterTypes::TYPE_STRING,
-                "created_at" => ParameterTypes::TYPE_STRING,
-                "news_id" => ParameterTypes::TYPE_INT
-            ]
-        );
-        return $this->databaseConnection->lastInsertId();
+
+        try {
+            $sql = "INSERT INTO `comment` (`body`, `created_at`, `news_id`) VALUES(:body, :created_at, :news_id)";
+            $currentDateTime = new \DateTimeImmutable();
+            $this->databaseConnection->execute(
+                $sql,
+                [
+                    $body,
+                    $currentDateTime->format("Y-m-d H:i:s"),
+                    $newsId
+                ],
+                [
+                    "body" => ParameterTypes::TYPE_STRING,
+                    "created_at" => ParameterTypes::TYPE_STRING,
+                    "news_id" => ParameterTypes::TYPE_INT
+                ]
+            );
+            return $this->databaseConnection->lastInsertId();
+        }
+        catch (\Throwable $throwable) {
+            $this->logger->error($throwable->getMessage());
+            return 0;
+        }
     }
 
-    public function deleteComment(int $id): bool|int
+    public function deleteComment(int $id): bool
     {
-        $sql = "DELETE FROM `comment` WHERE `id`= :id";
-        return $this->databaseConnection->execute(
-            $sql,
-            ["id" => $id],
-            ["id" => ParameterTypes::TYPE_INT]
-        );
+        try {
+            $sql = "DELETE FROM `comment` WHERE `id`= :id";
+            $this->databaseConnection->execute(
+                $sql,
+                ["id" => $id],
+                ["id" => ParameterTypes::TYPE_INT]
+            );
+            return false;
+        }
+        catch (\Throwable $throwable) {
+            $this->logger->error($throwable->getMessage());
+        }
     }
 
     public function deleteByNewsId(int $newsId)
     {
-        $sql = "DELETE FROM `comment` WHERE `news_id`= :news_id";
-        return $this->databaseConnection->execute(
-            $sql,
-            ["news_id" => $newsId],
-            ["news_id" => ParameterTypes::TYPE_INT]
-        );
+        try {
+            $sql = "DELETE FROM `comment` WHERE `news_id`= :news_id";
+            $this->databaseConnection->execute(
+                $sql,
+                ["news_id" => $newsId],
+                ["news_id" => ParameterTypes::TYPE_INT]
+            );
+            return true;
+        }
+        catch (\Throwable $throwable) {
+            $this->logger->error($throwable->getMessage());
+            return false;
+        }
     }
 
     public function getCommentsByNewsId(int $getId): array
@@ -93,7 +116,8 @@ class CommentRepository
                     ->setCreatedAt($row["created_at"])
                     ->setId($row["id"])
                     ->buildExisting();
-            } catch (InvalidCommentExceception) {
+            } catch (InvalidCommentExceception $exception) {
+                $this->logger->error($exception->getMessage());
             }
         }
         return $comments;
