@@ -15,12 +15,12 @@ enum ParameterTypes: string
 
     public function toPDO(): int
     {
-        return match ($this->value) {
-            self::TYPE_STRING, self::TYPE_FLOAT => \PDO::PARAM_STR,
-            self::TYPE_INT => \PDO::PARAM_INT,
-            self::TYPE_NULL => \PDO::PARAM_NULL,
-            self::TYPE_BOOL => \PDO::PARAM_BOOL,
-            default => throw new UnexpectedTypeException('Unexpected match value')
+        return match (ParameterTypes::tryFrom($this->value)) {
+            default => throw new UnexpectedTypeException("Unexpected match value '{$this->value}'"),
+            ParameterTypes::TYPE_STRING, ParameterTypes::TYPE_FLOAT => \PDO::PARAM_STR,
+            ParameterTypes::TYPE_INT => \PDO::PARAM_INT,
+            ParameterTypes::TYPE_NULL => \PDO::PARAM_NULL,
+            ParameterTypes::TYPE_BOOL => \PDO::PARAM_BOOL,
         };
     }
 }

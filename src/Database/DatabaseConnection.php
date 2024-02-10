@@ -28,7 +28,7 @@ class DatabaseConnection implements DatabaseConnectionInterface
     public function select(string $sql, array $values = [], array $types = []): array
     {
         $sth = $this->bindValues($sql, $values, $types);
-        $sth->execute();
+        $sth->execute($values);
         return $sth->fetchAll(\PDO::FETCH_ASSOC);
     }
 

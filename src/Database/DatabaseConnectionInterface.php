@@ -8,7 +8,7 @@ interface DatabaseConnectionInterface
      * @param string $sql
      * @param array<string, float|bool|int|string|null> $values=[]
      * @param array<ParameterTypes> $types=[]
-     * @return array<string,float|bool|int|string|null>
+     * @return array<array<string,float|bool|int|string|null>>
      */
     public function select(string $sql, array $values = [], array $types = []): array;
 

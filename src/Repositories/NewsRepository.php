@@ -29,11 +29,7 @@ final class NewsRepository
         $rows = $this->databaseConnection->select('SELECT * FROM `news`');
         $news = [];
         foreach ($rows as $row) {
-            $n = new News();
-            $news[] = $n->setId($row['id'])
-                ->setTitle($row['title'])
-                ->setBody($row['body'])
-                ->setCreatedAt(new \DateTimeImmutable($row['created_at']));
+            $news[] = $this->createNews($row);
         }
 
         return $news;
@@ -75,6 +71,16 @@ final class NewsRepository
             $sql,
             ["id" => $id],
             ["id" => ParameterTypes::TYPE_INT]
+        );
+    }
+
+    public function createNews(array $row): News
+    {
+        return new News(
+            $row['title'],
+            $row['body'],
+            new \DateTimeImmutable($row['created_at']),
+            $row['id']
         );
     }
 }
