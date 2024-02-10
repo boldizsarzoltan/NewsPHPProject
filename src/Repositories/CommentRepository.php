@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
+use App\Entity\Comments;
 use App\Repositories\Builder\CommentBuilder;
 use App\Repositories\Exceptions\InvalidCommentExceception;
 use Psr\Log\LoggerInterface;
@@ -18,19 +19,19 @@ class CommentRepository
     ) {
     }
 
-    public function listComments()
+    public function listComments(): Comments
     {
         $rows = $this->databaseConnection->select('SELECT * FROM `comment`');
 
-        $comments = [];
+        $comments = new Comments();
         foreach ($rows as $row) {
             try {
-                $comments[] = $this->commentBuilder
+                $comments->append($this->commentBuilder
                     ->setNewsId($row["news_id"])
                     ->setBody($row["body"])
                     ->setCreatedAt($row["created_at"])
                     ->setId($row["id"])
-                    ->buildExisting();
+                    ->buildExisting());
             } catch (InvalidCommentExceception $exceception) {
                 $this->logger->warning($exceception->getMessage());
             }
@@ -82,7 +83,7 @@ class CommentRepository
         }
     }
 
-    public function deleteByNewsId(int $newsId)
+    public function deleteByNewsId(int $newsId): bool
     {
         try {
             $sql = "DELETE FROM `comment` WHERE `news_id`= :news_id";
@@ -99,7 +100,7 @@ class CommentRepository
         }
     }
 
-    public function getCommentsByNewsId(int $getId): array
+    public function getCommentsByNewsId(int $getId): Comments
     {
         $rows = $this->databaseConnection->select(
             'SELECT * FROM `comment` where `news_id` = :news_id',
@@ -107,15 +108,15 @@ class CommentRepository
             [":news_id" => ParameterTypes::TYPE_INT],
         );
 
-        $comments = [];
+        $comments = new Comments();
         foreach ($rows as $row) {
             try {
-                $comments[] = $this->commentBuilder
+                $comments->append($this->commentBuilder
                     ->setNewsId($row["news_id"])
                     ->setBody($row["body"])
                     ->setCreatedAt($row["created_at"])
                     ->setId($row["id"])
-                    ->buildExisting();
+                    ->buildExisting());
             } catch (InvalidCommentExceception $exception) {
                 $this->logger->error($exception->getMessage());
             }

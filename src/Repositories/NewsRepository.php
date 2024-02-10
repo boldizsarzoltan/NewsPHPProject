@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
+use App\Entity\MultipleNews;
 use App\Entity\News;
 use App\Repositories\Builder\NewsBuilder;
 use App\Repositories\Exceptions\CannotDeleteNewsException;
@@ -24,19 +25,19 @@ final class NewsRepository
      * @return array<News>
      * list all news
      */
-    public function listNews(): array
+    public function listNews(): MultipleNews
     {
         $rows = $this->databaseConnection->select('SELECT * FROM `news`');
-        $news = [];
+        $news = new MultipleNews();
         foreach ($rows as $row) {
 
             try {
-                $news[] = $this->newsBuilder
+                $news->append($this->newsBuilder
                     ->setBody($row["body"])
                     ->setCreatedAt($row["created_at"])
                     ->setTitle($row["title"])
                     ->setId($row["id"])
-                    ->buildExisting();
+                    ->buildExisting());
             }
             catch (InvalidNewsExceception $exception) {
                 $this->logger->error($exception->getMessage());
@@ -51,29 +52,36 @@ final class NewsRepository
      */
     public function addNews(string $title, string $body): int|bool
     {
-        $currentDateTime = new \DateTimeImmutable();
-        $sql = "INSERT INTO `news` (`title`, `body`, `created_at`) VALUES(':title',':body',':created_at')";
-        $this->databaseConnection->execute(
-            $sql,
-            [
-                "title" => $title,
-                "body" => $body,
-                "created_at" => $currentDateTime->format("Y-m-d H:i:s")
-            ],
-            [
+        try {
 
-                "title" => ParameterTypes::TYPE_STRING,
-                "body" => ParameterTypes::TYPE_STRING,
-                "created_at" => ParameterTypes::TYPE_STRING
-            ]
-        );
-        return $this->databaseConnection->lastInsertId();
+            $currentDateTime = new \DateTimeImmutable();
+            $sql = "INSERT INTO `news` (`title`, `body`, `created_at`) VALUES(':title',':body',':created_at')";
+            $this->databaseConnection->execute(
+                $sql,
+                [
+                    "title" => $title,
+                    "body" => $body,
+                    "created_at" => $currentDateTime->format("Y-m-d H:i:s")
+                ],
+                [
+
+                    "title" => ParameterTypes::TYPE_STRING,
+                    "body" => ParameterTypes::TYPE_STRING,
+                    "created_at" => ParameterTypes::TYPE_STRING
+                ]
+            );
+            return (int) $this->databaseConnection->lastInsertId();
+        }
+        catch (\Throwable $throwable) {
+            $this->logger->error($throwable->getMessage());
+            return 0;
+        }
     }
 
     /**
      * deletes a news, and also linked comments
      */
-    public function deleteNews(int $id): int|bool
+    public function deleteNews(int $id): bool
     {
         $this->databaseConnection->startTransaction();
         try {
