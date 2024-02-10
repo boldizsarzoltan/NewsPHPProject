@@ -5,26 +5,19 @@ namespace App\Repositories;
 use App\Database\DatabaseConnection;
 use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
-use App\Entities\News;
+use App\Entity\News;
 
 final class NewsRepository
 {
-    private static ?self $instance = null;
+    private DatabaseConnectionInterface $databaseConnection;
+    private CommentRepository $commentManager;
 
-    private function __construct(
-        private readonly DatabaseConnectionInterface $databaseConnection,
-        private readonly CommentRepository $commentManager
-    ) {
-    }
-
-    public static function getInstance(
+    public function __construct(
         DatabaseConnectionInterface $databaseConnection,
         CommentRepository $commentManager
     ) {
-        if (null === self::$instance) {
-            self::$instance = new self($databaseConnection, $commentManager);
-        }
-        return self::$instance;
+        $this->databaseConnection = $databaseConnection;
+        $this->commentManager = $commentManager;
     }
 
     /**

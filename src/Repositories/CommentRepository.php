@@ -5,23 +5,14 @@ namespace App\Repositories;
 use App\Database\DatabaseConnection;
 use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
-use App\Entities\Comment;
+use App\Entity\Comment;
 
 class CommentRepository
 {
-    private static ?self $instance = null;
+    private DatabaseConnectionInterface $databaseConnection;
 
-    private function __construct(
-        private readonly DatabaseConnectionInterface $databaseConnection
-    ) {
-    }
-
-    public static function getInstance(DatabaseConnectionInterface $databaseConnection)
-    {
-        if (null === self::$instance) {
-            self::$instance = new self($databaseConnection);
-        }
-        return self::$instance;
+    public function __construct(DatabaseConnectionInterface $databaseConnection) {
+        $this->databaseConnection = $databaseConnection;
     }
 
     public function listComments()

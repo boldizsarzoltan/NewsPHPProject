@@ -8,9 +8,8 @@ class DatabaseConnection implements DatabaseConnectionInterface
 {
     private \PDO $pdo;
 
-    private static ?self $instance = null;
 
-    private function __construct()
+    public function __construct()
     {
         $database = getenv('DB_NAME');
         $host = getenv('DB_HOST');
@@ -18,14 +17,6 @@ class DatabaseConnection implements DatabaseConnectionInterface
         $password = getenv('DB_PASSWORD');
         $dsn = "mysql:dbname={$database};host={$host}";
         $this->pdo = new \PDO($dsn, $user, $password);
-    }
-
-    public static function getInstance(): self
-    {
-        if (null === self::$instance) {
-            self::$instance = new self;
-        }
-        return self::$instance;
     }
 
     /**

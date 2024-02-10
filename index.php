@@ -9,14 +9,13 @@ define('ROOT', __DIR__);
 
 require_once __DIR__ . '/bootstrap.php';
 
-$database = DatabaseConnection::getInstance();
-$commentManager = CommentRepository::getInstance($database);
-$newsManager = NewsRepository::getInstance($database, $commentManager);
-
-foreach ($newsManager->listNews() as $news) {
+$kernel = new \App\Kernel();
+$news = $kernel->getNewsRepository()->listNews();
+$commentRepository = $kernel->getCommentRepository();
+foreach ($kernel->getNewsRepository()->listNews() as $news) {
     echo("############ NEWS " . $news->getTitle() . " ############\n");
     echo($news->getBody() . "\n");
-    foreach ($commentManager->listComments() as $comment) {
+    foreach ($commentRepository->listComments() as $comment) {
         if ($comment->getNewsId() == $news->getId()) {
             echo("Comment " . $comment->getId() . " : " . $comment->getBody() . "\n");
         }
@@ -24,4 +23,4 @@ foreach ($newsManager->listNews() as $news) {
 }
 
 
-$c = $commentManager->listComments();
+$c = $commentRepository->listComments();

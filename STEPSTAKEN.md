@@ -39,3 +39,5 @@
     We use the database interface in each class and pass it through the constructor in order to prepare it for tests.
     We will pass all dependencies though the constructor, in order to make the code testable.
     We rename DAtabaseMangers to repositories.
+
+## 6.Add composer and libraries for testing, code quality and dependency injection

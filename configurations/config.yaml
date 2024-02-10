@@ -1,0 +1,25 @@
+services:
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    App\:
+        resource: '../src/*'
+        exclude:
+        - '../src/Entity/'
+        - '../src/Kernel.php'
+        - '../src/Database/DatabaseConnectionInterface.php'
+    App\Database\DatabaseConnectionInterface:
+        class:
+            App\Database\DatabaseConnection
+    App\Repositories\CommentRepository:
+        class:
+            App\Repositories\CommentRepository
+        arguments:
+            $databaseConnection: '@App\Database\DatabaseConnectionInterface'
+    App\Repositories\NewsRepository:
+        class:
+            App\Repositories\NewsRepository
+        arguments:
+            $databaseConnection: '@App\Database\DatabaseConnectionInterface'
+            $commentManager: '@App\Repositories\CommentRepository'
+
