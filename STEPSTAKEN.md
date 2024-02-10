@@ -46,4 +46,5 @@
     Add builders to construct entities. -> used Builder pattern
     Add transaction for complex database operations.
     Add logiing and logger from composer.
+## 7.Code styling, code types and unit tests + functional tests
     

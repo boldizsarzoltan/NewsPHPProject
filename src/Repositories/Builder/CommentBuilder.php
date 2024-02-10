@@ -38,10 +38,10 @@ class CommentBuilder
 
     public function buildNew(): Comment
     {
-        if(
-            !isset($this->body) ||
-            !isset($this->newsId) ||
-            !isset($this->createdAt)
+        if (
+            !isset($this->body)
+            || !isset($this->newsId)
+            || !isset($this->createdAt)
         ) {
             throw new InvalidCommentExceception();
         }
@@ -55,11 +55,11 @@ class CommentBuilder
 
     public function buildExisting(): Comment
     {
-        if(
-            !isset($this->body) ||
-            !isset($this->id) ||
-            !isset($this->newsId) ||
-            !isset($this->createdAt)
+        if (
+            !isset($this->body)
+            || !isset($this->id)
+            || !isset($this->newsId)
+            || !isset($this->createdAt)
         ) {
             throw new InvalidCommentExceception();
         }

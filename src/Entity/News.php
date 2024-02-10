@@ -13,7 +13,7 @@ class News
         string $title,
         string $body,
         \DateTimeInterface $createdAt,
-        ?int $id = NULL
+        ?int $id = null
     ) {
         $this->id = $id;
         $this->title = $title;

@@ -1,8 +1,10 @@
 <?php
 
-namespace App;
+/**
+ * The main source of everything
+ */
 
-require_once './vendor/autoload.php';
+namespace App;
 
 use App\Repositories\CommentRepository;
 use App\Repositories\NewsRepository;
@@ -30,7 +32,9 @@ class Kernel
     private function init()
     {
         $envLoader = $this->containerBuilder->get(EnvLoader::class);
-        /** @var $envLoader EnvLoader */
+        /**
+ * @var $envLoader EnvLoader
+*/
         $envLoader->load(".env");
     }
 

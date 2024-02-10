@@ -6,7 +6,7 @@ use App\Utils\TypedArrayObject;
 
 class MultipleNews extends TypedArrayObject
 {
-    function getType(): string
+    public function getType(): string
     {
         return News::class;
     }

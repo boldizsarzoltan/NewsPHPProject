@@ -11,7 +11,6 @@ use Psr\Log\LoggerInterface;
 
 class CommentRepository
 {
-
     public function __construct(
         private readonly DatabaseConnectionInterface $databaseConnection,
         private readonly CommentBuilder $commentBuilder,
@@ -26,12 +25,14 @@ class CommentRepository
         $comments = new Comments();
         foreach ($rows as $row) {
             try {
-                $comments->append($this->commentBuilder
-                    ->setNewsId($row["news_id"])
-                    ->setBody($row["body"])
-                    ->setCreatedAt($row["created_at"])
-                    ->setId($row["id"])
-                    ->buildExisting());
+                $comments->append(
+                    $this->commentBuilder
+                        ->setNewsId($row["news_id"])
+                        ->setBody($row["body"])
+                        ->setCreatedAt($row["created_at"])
+                        ->setId($row["id"])
+                        ->buildExisting()
+                );
             } catch (InvalidCommentExceception $exceception) {
                 $this->logger->warning($exceception->getMessage());
             }
@@ -60,8 +61,7 @@ class CommentRepository
                 ]
             );
             return $this->databaseConnection->lastInsertId();
-        }
-        catch (\Throwable $throwable) {
+        } catch (\Throwable $throwable) {
             $this->logger->error($throwable->getMessage());
             return 0;
         }
@@ -77,8 +77,7 @@ class CommentRepository
                 ["id" => ParameterTypes::TYPE_INT]
             );
             return false;
-        }
-        catch (\Throwable $throwable) {
+        } catch (\Throwable $throwable) {
             $this->logger->error($throwable->getMessage());
         }
     }
@@ -93,8 +92,7 @@ class CommentRepository
                 ["news_id" => ParameterTypes::TYPE_INT]
             );
             return true;
-        }
-        catch (\Throwable $throwable) {
+        } catch (\Throwable $throwable) {
             $this->logger->error($throwable->getMessage());
             return false;
         }
@@ -111,12 +109,14 @@ class CommentRepository
         $comments = new Comments();
         foreach ($rows as $row) {
             try {
-                $comments->append($this->commentBuilder
-                    ->setNewsId($row["news_id"])
-                    ->setBody($row["body"])
-                    ->setCreatedAt($row["created_at"])
-                    ->setId($row["id"])
-                    ->buildExisting());
+                $comments->append(
+                    $this->commentBuilder
+                        ->setNewsId($row["news_id"])
+                        ->setBody($row["body"])
+                        ->setCreatedAt($row["created_at"])
+                        ->setId($row["id"])
+                        ->buildExisting()
+                );
             } catch (InvalidCommentExceception $exception) {
                 $this->logger->error($exception->getMessage());
             }

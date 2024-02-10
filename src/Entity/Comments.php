@@ -6,7 +6,7 @@ use App\Utils\TypedArrayObject;
 
 class Comments extends TypedArrayObject
 {
-    function getType(): string
+    public function getType(): string
     {
         return Comment::class;
     }

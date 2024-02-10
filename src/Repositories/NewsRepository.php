@@ -30,16 +30,16 @@ final class NewsRepository
         $rows = $this->databaseConnection->select('SELECT * FROM `news`');
         $news = new MultipleNews();
         foreach ($rows as $row) {
-
             try {
-                $news->append($this->newsBuilder
-                    ->setBody($row["body"])
-                    ->setCreatedAt($row["created_at"])
-                    ->setTitle($row["title"])
-                    ->setId($row["id"])
-                    ->buildExisting());
-            }
-            catch (InvalidNewsExceception $exception) {
+                $news->append(
+                    $this->newsBuilder
+                        ->setBody($row["body"])
+                        ->setCreatedAt($row["created_at"])
+                        ->setTitle($row["title"])
+                        ->setId($row["id"])
+                        ->buildExisting()
+                );
+            } catch (InvalidNewsExceception $exception) {
                 $this->logger->error($exception->getMessage());
             }
         }
@@ -53,7 +53,6 @@ final class NewsRepository
     public function addNews(string $title, string $body): int|bool
     {
         try {
-
             $currentDateTime = new \DateTimeImmutable();
             $sql = "INSERT INTO `news` (`title`, `body`, `created_at`) VALUES(':title',':body',':created_at')";
             $this->databaseConnection->execute(
@@ -71,8 +70,7 @@ final class NewsRepository
                 ]
             );
             return (int) $this->databaseConnection->lastInsertId();
-        }
-        catch (\Throwable $throwable) {
+        } catch (\Throwable $throwable) {
             $this->logger->error($throwable->getMessage());
             return 0;
         }
@@ -86,7 +84,7 @@ final class NewsRepository
         $this->databaseConnection->startTransaction();
         try {
             $success = $this->commentManager->deleteByNewsId($id);
-            if($success) {
+            if ($success) {
                 throw new CannotDeleteNewsException();
             }
             $sql = "DELETE FROM `news` WHERE `id`= :id";
@@ -97,8 +95,7 @@ final class NewsRepository
             );
             $this->databaseConnection->commit();
             return true;
-        }
-        catch (\Throwable $throwable) {
+        } catch (\Throwable $throwable) {
             $this->databaseConnection->rollback();
             return false;
         }

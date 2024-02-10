@@ -38,9 +38,9 @@ class NewsBuilder
 
     public function buildNew(): News
     {
-        if(
-            !isset($this->body) ||
-            !isset($this->title)
+        if (
+            !isset($this->body)
+            || !isset($this->title)
         ) {
             throw new InvalidNewsExceception();
         }
@@ -57,11 +57,11 @@ class NewsBuilder
      */
     public function buildExisting(): News
     {
-        if(
-            !isset($this->body) ||
-            !isset($this->title) ||
-            !isset($this->createdAt) ||
-            !isset($this->id)
+        if (
+            !isset($this->body)
+            || !isset($this->title)
+            || !isset($this->createdAt)
+            || !isset($this->id)
         ) {
             throw new InvalidNewsExceception();
         }

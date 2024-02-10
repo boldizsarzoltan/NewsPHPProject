@@ -8,7 +8,7 @@ class Comment
         protected int $newsId,
         protected string $body,
         protected \DateTimeInterface $createdAt,
-        protected  ?int $id = null
+        protected ?int $id = null
     ) {
     }
 

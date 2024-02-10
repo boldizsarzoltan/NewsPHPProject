@@ -1,12 +1,16 @@
 <?php
 
+/**
+ * Generic class to not repeat code
+ */
+
 namespace App\Utils;
 
 use App\Utils\Exceptions\InvalidTypeException;
 
 abstract class TypedArrayObject extends \ArrayObject
 {
-    abstract function getType(): string;
+    abstract public function getType(): string;
 
     public function __construct(object|array $array = [], int $flags = 0, string $iteratorClass = "ArrayIterator")
     {
@@ -38,7 +42,7 @@ abstract class TypedArrayObject extends \ArrayObject
 
     private function verifyType(object $object): void
     {
-        if($object::class !== $this->getType()) {
+        if ($object::class !== $this->getType()) {
             throw new InvalidTypeException();
         }
     }

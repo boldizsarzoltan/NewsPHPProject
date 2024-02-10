@@ -4,9 +4,10 @@ namespace App\Utils;
 
 use App\Utils\Exceptions\EnvironmentVariableDoesNotExist;
 
-class EnvLoader {
+class EnvLoader
+{
     /**
-     * @param string $envFilePath
+     * @param  string $envFilePath
      * @return void
      * @throws EnvironmentVariableDoesNotExist
      */

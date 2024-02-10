@@ -1,10 +1,5 @@
 <?php
 
-
-use App\Database\DatabaseConnection;
-use App\Repositories\CommentRepository;
-use App\Repositories\NewsRepository;
-
 define('ROOT', __DIR__);
 
 require_once __DIR__ . '/bootstrap.php';

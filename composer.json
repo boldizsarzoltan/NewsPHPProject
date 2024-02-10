@@ -22,5 +22,8 @@
         "ext-pdo": "*",
         "psr/log": "^3.0",
         "monolog/monolog": "^3.5"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*"
     }
 }

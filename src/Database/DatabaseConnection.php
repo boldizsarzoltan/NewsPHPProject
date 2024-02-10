@@ -20,9 +20,9 @@ class DatabaseConnection implements DatabaseConnectionInterface
     }
 
     /**
-     * @param string $sql
-     * @param array<string, float|bool|int|string|null> $values
-     * @param array<ParameterTypes> $types
+     * @param  string                                    $sql
+     * @param  array<string, float|bool|int|string|null> $values
+     * @param  array<ParameterTypes>                     $types
      * @return array<string,float|bool|int|string|null>
      */
     public function select(string $sql, array $values = [], array $types = []): array
@@ -44,9 +44,9 @@ class DatabaseConnection implements DatabaseConnectionInterface
     }
 
     /**
-     * @param string $sql
-     * @param array $values
-     * @param array<ParameterTypes> $types
+     * @param  string                $sql
+     * @param  array                 $values
+     * @param  array<ParameterTypes> $types
      * @return false|\PDOStatement
      */
     private function bindValues(string $sql, array $values, array $types): \PDOStatement|false
@@ -81,6 +81,4 @@ class DatabaseConnection implements DatabaseConnectionInterface
     {
         $this->pdo->rollBack();
     }
-
-
 }
