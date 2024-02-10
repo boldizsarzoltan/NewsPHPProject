@@ -3,6 +3,7 @@
 namespace App\DatabaseManager;
 
 use App\Database\DatabaseConnection;
+use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
 use App\Entities\News;
 
@@ -10,14 +11,18 @@ final class NewsManager
 {
     private static ?self $instance = null;
 
-    private function __construct()
-    {
+    private function __construct(
+        private readonly DatabaseConnectionInterface $databaseConnection,
+        private readonly CommentManager $commentManager
+    ) {
     }
 
-    public static function getInstance(): self
-    {
+    public static function getInstance(
+        DatabaseConnectionInterface $databaseConnection,
+        CommentManager $commentManager
+    ) {
         if (null === self::$instance) {
-            self::$instance = new self;
+            self::$instance = new self($databaseConnection, $commentManager);
         }
         return self::$instance;
     }
@@ -28,8 +33,7 @@ final class NewsManager
      */
     public function listNews(): array
     {
-        $db = DatabaseConnection::getInstance();
-        $rows = $db->select('SELECT * FROM `news`');
+        $rows = $this->databaseConnection->select('SELECT * FROM `news`');
         $news = [];
         foreach ($rows as $row) {
             $n = new News();
@@ -47,10 +51,9 @@ final class NewsManager
      */
     public function addNews(string $title, string $body): int|bool
     {
-        $db = DatabaseConnection::getInstance();
         $currentDateTime = new \DateTimeImmutable();
         $sql = "INSERT INTO `news` (`title`, `body`, `created_at`) VALUES(':title',':body',':created_at')";
-        $db->execute(
+        $this->databaseConnection->execute(
             $sql,
             [
                 "title" => $title,
@@ -72,7 +75,7 @@ final class NewsManager
      */
     public function deleteNews(int $id): int|bool
     {
-        $comments = CommentManager::getInstance()->listComments();
+        $comments = $this->commentManager->listComments();
         $idsToDelete = [];
 
         foreach ($comments as $comment) {
@@ -82,7 +85,7 @@ final class NewsManager
         }
 
         foreach ($idsToDelete as $id) {
-            CommentManager::getInstance()->deleteComment($id);
+            $this->commentManager->deleteComment($id);
         }
 
         $db = DatabaseConnection::getInstance();

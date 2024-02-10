@@ -3,6 +3,7 @@
 namespace App\DatabaseManager;
 
 use App\Database\DatabaseConnection;
+use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
 use App\Entities\Comment;
 
@@ -10,18 +11,22 @@ class CommentManager
 {
     private static ?self $instance = null;
 
-    public static function getInstance()
+    private function __construct(
+        private readonly DatabaseConnectionInterface $databaseConnection
+    ) {
+    }
+
+    public static function getInstance(DatabaseConnectionInterface $databaseConnection)
     {
         if (null === self::$instance) {
-            self::$instance = new self;
+            self::$instance = new self($databaseConnection);
         }
         return self::$instance;
     }
 
     public function listComments()
     {
-        $db = DatabaseConnection::getInstance();
-        $rows = $db->select('SELECT * FROM `comment`');
+        $rows = $this->databaseConnection->select('SELECT * FROM `comment`');
 
         $comments = [];
         foreach ($rows as $row) {
@@ -37,10 +42,9 @@ class CommentManager
 
     public function addCommentForNews(string $body, int $newsId): bool|string
     {
-        $db = DatabaseConnection::getInstance();
         $sql = "INSERT INTO `comment` (`body`, `created_at`, `news_id`) VALUES(:body, :created_at, :news_id)";
         $currentDateTime = new \DateTimeImmutable();
-        $db->execute(
+        $this->databaseConnection->execute(
             $sql,
             [
                 $body,
@@ -53,14 +57,13 @@ class CommentManager
                 "news_id" => ParameterTypes::TYPE_INT
             ]
         );
-        return $db->lastInsertId();
+        return $this->databaseConnection->lastInsertId();
     }
 
     public function deleteComment(int $id): bool|int
     {
-        $db = DatabaseConnection::getInstance();
         $sql = "DELETE FROM `comment` WHERE `id`= :id";
-        return $db->execute(
+        return $this->databaseConnection->execute(
             $sql,
             ["id" => $id],
             ["" => ParameterTypes::TYPE_INT]

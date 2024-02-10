@@ -36,3 +36,5 @@
     Avoid using database "exec", use prepared statements.
     We will use avbstaction for fursther abstraction setps.
     We will extract an interface from the database, in order to break direct dependencies.
+    We use the database interface in each class and pass it through the constructor in order to prepare it for tests.
+    We will pass all dependencies though the constructor, in order to make the code testable.
