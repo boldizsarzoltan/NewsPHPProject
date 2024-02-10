@@ -46,5 +46,8 @@
     Add builders to construct entities. -> used Builder pattern
     Add transaction for complex database operations.
     Add logiing and logger from composer.
-## 7.Code styling, code types and unit tests + functional tests
+## 7.Code styling, code types and unit tests
+    use phpcs PSR12 standard for code
+    use phpstan for quality
+    use phpunit for tests
     

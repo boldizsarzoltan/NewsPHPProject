@@ -29,15 +29,6 @@ class Kernel
         $this->init();
     }
 
-    private function init(): void
-    {
-        $envLoader = $this->containerBuilder->get(EnvLoader::class);
-        /**
-         * @var EnvLoader $envLoader
-         */
-        $envLoader->load(".env");
-    }
-
     public function getCommentRepository(): CommentRepository
     {
         /** @var CommentRepository $commentRepository */
@@ -56,5 +47,22 @@ class Kernel
             ContainerInterface::NULL_ON_INVALID_REFERENCE
         );
         return $newsRepository;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getEnvFile(): string
+    {
+        return ".env";
+    }
+
+    private function init(): void
+    {
+        $envLoader = $this->containerBuilder->get(EnvLoader::class);
+        /**
+         * @var EnvLoader $envLoader
+         */
+        $envLoader->load($this->getEnvFile());
     }
 }
