@@ -43,5 +43,7 @@
 ## 6.Add composer and libraries for testing, code quality and dependency injection:
     Add symfonyDI to remove singletons and private constructors.
     Refactor Services to not filter in app, instead use the database.
-    Add builders and validators to construct entities. -> used Builder pattern
+    Add builders to construct entities. -> used Builder pattern
+    Add transaction for complex database operations.
+    Add logiing and logger from composer.
     

@@ -6,6 +6,7 @@ use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
 use App\Entity\News;
 use App\Repositories\Builder\NewsBuilder;
+use App\Repositories\Exceptions\CannotDeleteNewsException;
 use App\Repositories\Exceptions\InvalidNewsExceception;
 use Psr\Log\LoggerInterface;
 
@@ -77,7 +78,9 @@ final class NewsRepository
         $this->databaseConnection->startTransaction();
         try {
             $success = $this->commentManager->deleteByNewsId($id);
-
+            if($success) {
+                throw new CannotDeleteNewsException();
+            }
             $sql = "DELETE FROM `news` WHERE `id`= :id";
             $this->databaseConnection->execute(
                 $sql,
