@@ -2,16 +2,16 @@
 
 
 use App\Database\DatabaseConnection;
-use App\DatabaseManager\CommentManager;
-use App\DatabaseManager\NewsManager;
+use App\Repositories\CommentRepository;
+use App\Repositories\NewsRepository;
 
 define('ROOT', __DIR__);
 
 require_once __DIR__ . '/bootstrap.php';
 
 $database = DatabaseConnection::getInstance();
-$commentManager = CommentManager::getInstance($database);
-$newsManager = NewsManager::getInstance($database, $commentManager);
+$commentManager = CommentRepository::getInstance($database);
+$newsManager = NewsRepository::getInstance($database, $commentManager);
 
 foreach ($newsManager->listNews() as $news) {
     echo("############ NEWS " . $news->getTitle() . " ############\n");

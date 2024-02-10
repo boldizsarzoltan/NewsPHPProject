@@ -23,7 +23,7 @@ class EnvLoader {
         // Parse the contents to extract key-value pairs
         $lines = explode("\n", $contents);
         foreach ($lines as $line) {
-            if (!empty($line) && strpos($line, '=') !== false && $line[0] !== '#') {
+            if (!empty($line) && str_contains($line, '=') && !str_starts_with($line, '#')) {
                 list($key, $value) = explode('=', $line, 2);
                 $key = trim($key);
                 $value = trim($value);

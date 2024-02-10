@@ -38,3 +38,4 @@
     We will extract an interface from the database, in order to break direct dependencies.
     We use the database interface in each class and pass it through the constructor in order to prepare it for tests.
     We will pass all dependencies though the constructor, in order to make the code testable.
+    We rename DAtabaseMangers to repositories.

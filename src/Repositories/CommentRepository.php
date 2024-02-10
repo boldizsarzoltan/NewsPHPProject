@@ -1,13 +1,13 @@
 <?php
 
-namespace App\DatabaseManager;
+namespace App\Repositories;
 
 use App\Database\DatabaseConnection;
 use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
 use App\Entities\Comment;
 
-class CommentManager
+class CommentRepository
 {
     private static ?self $instance = null;
 

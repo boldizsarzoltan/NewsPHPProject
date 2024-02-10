@@ -1,25 +1,25 @@
 <?php
 
-namespace App\DatabaseManager;
+namespace App\Repositories;
 
 use App\Database\DatabaseConnection;
 use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
 use App\Entities\News;
 
-final class NewsManager
+final class NewsRepository
 {
     private static ?self $instance = null;
 
     private function __construct(
         private readonly DatabaseConnectionInterface $databaseConnection,
-        private readonly CommentManager $commentManager
+        private readonly CommentRepository $commentManager
     ) {
     }
 
     public static function getInstance(
         DatabaseConnectionInterface $databaseConnection,
-        CommentManager $commentManager
+        CommentRepository $commentManager
     ) {
         if (null === self::$instance) {
             self::$instance = new self($databaseConnection, $commentManager);
@@ -67,7 +67,7 @@ final class NewsManager
                 "created_at" => ParameterTypes::TYPE_STRING
             ]
         );
-        return $db->lastInsertId();
+        return $this->databaseConnection->lastInsertId();
     }
 
     /**
