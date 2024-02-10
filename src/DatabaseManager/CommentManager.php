@@ -3,6 +3,7 @@
 namespace App\DatabaseManager;
 
 use App\Database\DatabaseConnection;
+use App\Database\ParameterTypes;
 use App\Entities\Comment;
 
 class CommentManager
@@ -37,15 +38,32 @@ class CommentManager
     public function addCommentForNews(string $body, int $newsId): bool|string
     {
         $db = DatabaseConnection::getInstance();
-        $sql = "INSERT INTO `comment` (`body`, `created_at`, `news_id`) VALUES('" . $body . "','" . date('Y-m-d') . "','" . $newsId . "')";
-        $db->exec($sql);
-        return $db->lastInsertId($sql);
+        $sql = "INSERT INTO `comment` (`body`, `created_at`, `news_id`) VALUES(:body, :created_at, :news_id)";
+        $currentDateTime = new \DateTimeImmutable();
+        $db->execute(
+            $sql,
+            [
+                $body,
+                $currentDateTime->format("Y-m-d H:i:s"),
+                $newsId
+            ],
+            [
+                "body" => ParameterTypes::TYPE_STRING,
+                "created_at" => ParameterTypes::TYPE_STRING,
+                "news_id" => ParameterTypes::TYPE_INT
+            ]
+        );
+        return $db->lastInsertId();
     }
 
     public function deleteComment(int $id): bool|int
     {
         $db = DatabaseConnection::getInstance();
-        $sql = "DELETE FROM `comment` WHERE `id`=" . $id;
-        return $db->exec($sql);
+        $sql = "DELETE FROM `comment` WHERE `id`= :id";
+        return $db->execute(
+            $sql,
+            ["id" => $id],
+            ["" => ParameterTypes::TYPE_INT]
+        );
     }
 }

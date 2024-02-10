@@ -3,6 +3,7 @@
 namespace App\DatabaseManager;
 
 use App\Database\DatabaseConnection;
+use App\Database\ParameterTypes;
 use App\Entities\News;
 
 final class NewsManager
@@ -29,7 +30,6 @@ final class NewsManager
     {
         $db = DatabaseConnection::getInstance();
         $rows = $db->select('SELECT * FROM `news`');
-
         $news = [];
         foreach ($rows as $row) {
             $n = new News();
@@ -48,8 +48,22 @@ final class NewsManager
     public function addNews(string $title, string $body): int|bool
     {
         $db = DatabaseConnection::getInstance();
-        $sql = "INSERT INTO `news` (`title`, `body`, `created_at`) VALUES('" . $title . "','" . $body . "','" . date('Y-m-d') . "')";
-        $db->exec($sql);
+        $currentDateTime = new \DateTimeImmutable();
+        $sql = "INSERT INTO `news` (`title`, `body`, `created_at`) VALUES(':title',':body',':created_at')";
+        $db->execute(
+            $sql,
+            [
+                "title" => $title,
+                "body" => $body,
+                "created_at" => $currentDateTime->format("Y-m-d H:i:s")
+            ],
+            [
+
+                "title" => ParameterTypes::TYPE_STRING,
+                "body" => ParameterTypes::TYPE_STRING,
+                "created_at" => ParameterTypes::TYPE_STRING
+            ]
+        );
         return $db->lastInsertId();
     }
 
@@ -72,7 +86,11 @@ final class NewsManager
         }
 
         $db = DatabaseConnection::getInstance();
-        $sql = "DELETE FROM `news` WHERE `id`=" . $id;
-        return $db->exec($sql);
+        $sql = "DELETE FROM `news` WHERE `id`= :id";
+        return $db->execute(
+            $sql,
+            ["id" => $id],
+            ["id" => ParameterTypes::TYPE_INT]
+        );
     }
 }

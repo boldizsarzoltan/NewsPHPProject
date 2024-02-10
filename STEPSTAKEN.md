@@ -33,3 +33,6 @@
     Remove teh usage of __CLASS__ and use self/static instead.
     Add types where possible.
     Remove uncecessary varaibles.
+    Avoid using database "exec", use prepared statements.
+    We will use avbstaction for fursther abstraction setps.
+    We will extract an interface from the database, in order to break direct dependencies.

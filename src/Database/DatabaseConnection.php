@@ -2,7 +2,9 @@
 
 namespace App\Database;
 
-class DatabaseConnection
+use App\Database\Exceptions\DatabaseException;
+
+class DatabaseConnection implements DatabaseConnectionInterface
 {
     private \PDO $pdo;
 
@@ -28,22 +30,49 @@ class DatabaseConnection
 
     /**
      * @param string $sql
-     * @return array<mixed>|false
+     * @param array<string, float|bool|int|string|null> $values
+     * @param array<ParameterTypes> $types
+     * @return array<string,float|bool|int|string|null>
      */
-    public function select(string $sql): array|false
+    public function select(string $sql, array $values = [], array $types = []): array
     {
-        $sth = $this->pdo->query($sql);
-        return $sth->fetchAll();
+        $sth = $this->bindValues($sql, $values, $types);
+        $sth->execute();
+        return $sth->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function exec(string $sql): bool|int
+    public function execute(string $sql, array $values = [], array $types = []): bool|int
     {
-        return $this->pdo->exec($sql);
+        $sth = $this->bindValues($sql, $values, $types);
+        return $sth->execute();
     }
 
-    //TODO: change bool into false in 8.2
-    public function lastInsertId(): bool|string
+    public function lastInsertId(): bool|int
     {
         return $this->pdo->lastInsertId();
+    }
+
+    /**
+     * @param string $sql
+     * @param array $values
+     * @param array<ParameterTypes> $types
+     * @return false|\PDOStatement
+     */
+    private function bindValues(string $sql, array $values, array $types): \PDOStatement|false
+    {
+        $sth = $this->pdo->prepare($sql);
+        foreach ($values as $name => $value) {
+            $type = $types[$name]->toPDO();
+            $success = $sth->bindValue(
+                $value,
+                $name,
+                $type
+            );
+            if ($success) {
+                continue;
+            }
+            throw new DatabaseException("{$value} of type {$type} for {$name} is incorrect");
+        }
+        return $sth;
     }
 }
