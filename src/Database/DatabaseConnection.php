@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Utils;
+namespace App\Database;
 
-class DB
+class DatabaseConnection
 {
     private $pdo;
 
@@ -10,10 +10,11 @@ class DB
 
     private function __construct()
     {
-        $dsn = 'mysql:dbname=phptest;host=127.0.0.1';
-        $user = 'root';
-        $password = 'root';
-
+        $database = getenv('DB_NAME');
+        $host = getenv('DB_HOST');
+        $user = getenv('DB_USER');
+        $password = getenv('DB_PASSWORD');
+        $dsn = "mysql:dbname={$database};host={$host}";
         $this->pdo = new \PDO($dsn, $user, $password);
     }
 

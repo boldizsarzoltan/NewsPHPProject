@@ -1,11 +1,12 @@
 <?php
 
-use App\Utils\CommentManager;
-use App\Utils\NewsManager;
+
+use App\DatabaseManager\CommentManager;
+use App\DatabaseManager\NewsManager;
 
 define('ROOT', __DIR__);
 
-require_once(ROOT . '/autoload.php');
+require_once __DIR__ . '/bootstrap.php';
 
 foreach (NewsManager::getInstance()->listNews() as $news) {
 	echo("############ NEWS " . $news->getTitle() . " ############\n");

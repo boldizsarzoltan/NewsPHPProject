@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Utils;
+namespace App\DatabaseManager;
 
-use App\Class\Comment;
+use App\Database\DatabaseConnection;
+use App\Entities\Comment;
 
 class CommentManager
 {
@@ -19,7 +20,7 @@ class CommentManager
 
     public function listComments()
     {
-        $db = DB::getInstance();
+        $db = DatabaseConnection::getInstance();
         $rows = $db->select('SELECT * FROM `comment`');
 
         $comments = [];
@@ -36,7 +37,7 @@ class CommentManager
 
     public function addCommentForNews($body, $newsId)
     {
-        $db = DB::getInstance();
+        $db = DatabaseConnection::getInstance();
         $sql = "INSERT INTO `comment` (`body`, `created_at`, `news_id`) VALUES('" . $body . "','" . date('Y-m-d') . "','" . $newsId . "')";
         $db->exec($sql);
         return $db->lastInsertId($sql);
@@ -44,7 +45,7 @@ class CommentManager
 
     public function deleteComment($id)
     {
-        $db = DB::getInstance();
+        $db = DatabaseConnection::getInstance();
         $sql = "DELETE FROM `comment` WHERE `id`=" . $id;
         return $db->exec($sql);
     }

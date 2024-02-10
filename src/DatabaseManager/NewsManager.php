@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Utils;
+namespace App\DatabaseManager;
 
-use App\Class\News;
+use App\Database\DatabaseConnection;
+use App\Entities\News;
 
 class NewsManager
 {
@@ -26,7 +27,7 @@ class NewsManager
      */
     public function listNews()
     {
-        $db = DB::getInstance();
+        $db = DatabaseConnection::getInstance();
         $rows = $db->select('SELECT * FROM `news`');
 
         $news = [];
@@ -46,7 +47,7 @@ class NewsManager
      */
     public function addNews($title, $body)
     {
-        $db = DB::getInstance();
+        $db = DatabaseConnection::getInstance();
         $sql = "INSERT INTO `news` (`title`, `body`, `created_at`) VALUES('" . $title . "','" . $body . "','" . date('Y-m-d') . "')";
         $db->exec($sql);
         return $db->lastInsertId($sql);
@@ -70,7 +71,7 @@ class NewsManager
             CommentManager::getInstance()->deleteComment($id);
         }
 
-        $db = DB::getInstance();
+        $db = DatabaseConnection::getInstance();
         $sql = "DELETE FROM `news` WHERE `id`=" . $id;
         return $db->exec($sql);
     }

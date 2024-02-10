@@ -12,5 +12,20 @@
     In order to make the project simplier we have to an autoloader.
     For now we will not use composer, we will write it manually.
     In a bigger pject we would use a simplier composer dependecy, liek symfony autoloader.
+    WIth the autoloader we can actually delte all the requires from the project.
 
-    
+## 3. Database connection
+    The first step in such a prject is to see if there is hardcoded database conenction which in our case there is.
+    We have to ensure that this information does not make it to git, this a security vulnerability.
+    We have to read it from the enviorement, and the enviorement, in out case ".env" does not make it to git.
+    In order to load enviorement vraibles we use a nwe class, in order to se this class we create a separate file as a setup.
+    The standard setup file is "bootsrap.php" we will go by this standard.
+
+## 4. Separation the project into layers
+    Each prject needs layers, so we will restructure the rpject into multiple layers.
+    THe main ones will be:
+        1.Database
+        2.Database Managers
+        3.Entitities
+        4.Utils
+    We will rename the DB class into DatabaeeConnection in order to clarify what it does.
