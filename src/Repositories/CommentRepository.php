@@ -57,7 +57,17 @@ class CommentRepository
         return $this->databaseConnection->execute(
             $sql,
             ["id" => $id],
-            ["" => ParameterTypes::TYPE_INT]
+            ["id" => ParameterTypes::TYPE_INT]
+        );
+    }
+
+    public function deleteByNewsId(int $newsId)
+    {
+        $sql = "DELETE FROM `comment` WHERE `news_id`= :news_id";
+        return $this->databaseConnection->execute(
+            $sql,
+            ["news_id" => $newsId],
+            ["news_id" => ParameterTypes::TYPE_INT]
         );
     }
 }

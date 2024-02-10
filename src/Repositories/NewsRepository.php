@@ -68,22 +68,10 @@ final class NewsRepository
      */
     public function deleteNews(int $id): int|bool
     {
-        $comments = $this->commentManager->listComments();
-        $idsToDelete = [];
+        $comments = $this->commentManager->deleteByNewsId($id);
 
-        foreach ($comments as $comment) {
-            if ($comment->getNewsId() == $id) {
-                $idsToDelete[] = $comment->getId();
-            }
-        }
-
-        foreach ($idsToDelete as $id) {
-            $this->commentManager->deleteComment($id);
-        }
-
-        $db = DatabaseConnection::getInstance();
         $sql = "DELETE FROM `news` WHERE `id`= :id";
-        return $db->execute(
+        return $this->databaseConnection->execute(
             $sql,
             ["id" => $id],
             ["id" => ParameterTypes::TYPE_INT]

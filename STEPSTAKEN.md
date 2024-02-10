@@ -40,4 +40,7 @@
     We will pass all dependencies though the constructor, in order to make the code testable.
     We rename DAtabaseMangers to repositories.
 
-## 6.Add composer and libraries for testing, code quality and dependency injection
+## 6.Add composer and libraries for testing, code quality and dependency injection:
+    Add symfonyDI to remove singletons and private constructors.
+    Refactor Services to not filter in app, instead use the database.
+    
