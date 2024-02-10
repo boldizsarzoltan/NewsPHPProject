@@ -5,7 +5,7 @@ namespace App\DatabaseManager;
 use App\Database\DatabaseConnection;
 use App\Entities\News;
 
-class NewsManager
+final class NewsManager
 {
     private static $instance = null;
 
@@ -13,11 +13,10 @@ class NewsManager
     {
     }
 
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (null === self::$instance) {
-            $c = __CLASS__;
-            self::$instance = new $c;
+            self::$instance = new self;
         }
         return self::$instance;
     }

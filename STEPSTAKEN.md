@@ -29,3 +29,5 @@
         3.Entitities
         4.Utils
     We will rename the DB class into DatabaeeConnection in order to clarify what it does.
+## 5.Improve the general quality of code:
+    REmove teh usage of __CLASS__ and use self/static instead.

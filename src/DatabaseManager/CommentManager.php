@@ -12,8 +12,7 @@ class CommentManager
     public static function getInstance()
     {
         if (null === self::$instance) {
-            $c = __CLASS__;
-            self::$instance = new $c;
+            self::$instance = new self;
         }
         return self::$instance;
     }
