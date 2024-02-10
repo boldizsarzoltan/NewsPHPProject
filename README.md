@@ -13,3 +13,10 @@ This simple application works, but with very old-style monolithic codebase, so d
 
   - easier to work with
   - more maintainable
+
+## 3. New installation
+
+
+- install composer after step 1
+- run "composer install"
+- put dabase credetials into ".env" file
