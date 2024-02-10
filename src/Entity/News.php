@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Exception\InvalidEntityException;
+
 class News
 {
     protected ?int $id;
@@ -24,6 +26,9 @@ class News
 
     public function getId(): int
     {
+        if (is_null($this->id)) {
+            throw new InvalidEntityException();
+        }
         return $this->id;
     }
 

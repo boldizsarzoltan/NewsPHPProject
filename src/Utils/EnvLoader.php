@@ -20,6 +20,9 @@ class EnvLoader
 
         // Read the contents of the .env file
         $contents = file_get_contents($envFilePath);
+        if (!$contents) {
+            throw new EnvironmentVariableDoesNotExist($envFilePath);
+        }
 
         // Parse the contents to extract key-value pairs
         $lines = explode("\n", $contents);

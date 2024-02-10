@@ -22,7 +22,7 @@ final class NewsRepository
     }
 
     /**
-     * @return array<News>
+     * @return MultipleNews<News>
      * list all news
      */
     public function listNews(): MultipleNews
@@ -33,10 +33,10 @@ final class NewsRepository
             try {
                 $news->append(
                     $this->newsBuilder
-                        ->setBody($row["body"])
-                        ->setCreatedAt($row["created_at"])
-                        ->setTitle($row["title"])
-                        ->setId($row["id"])
+                        ->setBody((string) $row["body"])
+                        ->setCreatedAt((string) $row["created_at"])
+                        ->setTitle((string) $row["title"])
+                        ->setId((int) $row["id"])
                         ->buildExisting()
                 );
             } catch (InvalidNewsExceception $exception) {

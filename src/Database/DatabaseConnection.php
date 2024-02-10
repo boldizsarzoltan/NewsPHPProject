@@ -3,49 +3,59 @@
 namespace App\Database;
 
 use App\Database\Exceptions\DatabaseException;
+use App\Database\Exceptions\UnexpectedDatabaseFailure;
+use App\Database\Exceptions\UnexpectedTransactionFailure;
 
 class DatabaseConnection implements DatabaseConnectionInterface
 {
     private \PDO $pdo;
 
-
     public function __construct()
     {
-        $database = getenv('DB_NAME');
-        $host = getenv('DB_HOST');
-        $user = getenv('DB_USER');
-        $password = getenv('DB_PASSWORD');
+        $database = (string) getenv('DB_NAME');
+        $host = (string) getenv('DB_HOST');
+        $user = (string) getenv('DB_USER');
+        $password = (string) getenv('DB_PASSWORD');
         $dsn = "mysql:dbname={$database};host={$host}";
         $this->pdo = new \PDO($dsn, $user, $password);
     }
 
     /**
-     * @param  string                                    $sql
-     * @param  array<string, float|bool|int|string|null> $values
-     * @param  array<ParameterTypes>                     $types
-     * @return array<string,float|bool|int|string|null>
+     * @inheritDoc
      */
     public function select(string $sql, array $values = [], array $types = []): array
     {
         $sth = $this->bindValues($sql, $values, $types);
+        if (false === $sth) {
+            throw new UnexpectedDatabaseFailure();
+        }
         $sth->execute($values);
         return $sth->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function execute(string $sql, array $values = [], array $types = []): bool|int
     {
         $sth = $this->bindValues($sql, $values, $types);
+        if (false === $sth) {
+            throw new UnexpectedDatabaseFailure();
+        }
         return $sth->execute();
     }
 
-    public function lastInsertId(): bool|int
+    /**
+     * @inheritDoc
+     */
+    public function lastInsertId(): int
     {
-        return $this->pdo->lastInsertId();
+        return (int) $this->pdo->lastInsertId();
     }
 
     /**
-     * @param  string                $sql
-     * @param  array                 $values
+     * @param  string $sql
+     * @param  array<string, float|bool|int|string|null> $values
      * @param  array<ParameterTypes> $types
      * @return false|\PDOStatement
      */
@@ -55,8 +65,8 @@ class DatabaseConnection implements DatabaseConnectionInterface
         foreach ($values as $name => $value) {
             $type = $types[$name]->toPDO();
             $success = $sth->bindValue(
-                $value,
                 $name,
+                $value,
                 $type
             );
             if ($success) {
@@ -67,18 +77,26 @@ class DatabaseConnection implements DatabaseConnectionInterface
         return $sth;
     }
 
-    public function startTransaction(): bool|int
+    public function startTransaction(): void
     {
-        $this->pdo->beginTransaction();
+        if (!$this->pdo->beginTransaction()) {
+            throw new UnexpectedTransactionFailure();
+        }
     }
 
-    public function commit(): bool|int
+    public function commit(): void
     {
         $this->pdo->commit();
+        if (!$this->pdo->commit()) {
+            throw new UnexpectedTransactionFailure();
+        }
     }
 
-    public function rollback(): bool|int
+    public function rollback(): void
     {
         $this->pdo->rollBack();
+        if (!$this->pdo->rollBack()) {
+            throw new UnexpectedTransactionFailure();
+        }
     }
 }

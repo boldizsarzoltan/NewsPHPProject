@@ -29,22 +29,32 @@ class Kernel
         $this->init();
     }
 
-    private function init()
+    private function init(): void
     {
         $envLoader = $this->containerBuilder->get(EnvLoader::class);
         /**
- * @var $envLoader EnvLoader
-*/
+         * @var EnvLoader $envLoader
+         */
         $envLoader->load(".env");
     }
 
     public function getCommentRepository(): CommentRepository
     {
-        return $this->containerBuilder->get(CommentRepository::class, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        /** @var CommentRepository $commentRepository */
+        $commentRepository = $this->containerBuilder->get(
+            CommentRepository::class,
+            ContainerInterface::NULL_ON_INVALID_REFERENCE
+        );
+        return $commentRepository;
     }
 
     public function getNewsRepository(): NewsRepository
     {
-        return $this->containerBuilder->get(NewsRepository::class, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        /** @var NewsRepository $newsRepository */
+        $newsRepository = $this->containerBuilder->get(
+            NewsRepository::class,
+            ContainerInterface::NULL_ON_INVALID_REFERENCE
+        );
+        return $newsRepository;
     }
 }

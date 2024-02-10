@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
+use App\Entity\Comment;
 use App\Entity\Comments;
 use App\Repositories\Builder\CommentBuilder;
 use App\Repositories\Exceptions\InvalidCommentExceception;
@@ -27,10 +28,10 @@ class CommentRepository
             try {
                 $comments->append(
                     $this->commentBuilder
-                        ->setNewsId($row["news_id"])
-                        ->setBody($row["body"])
-                        ->setCreatedAt($row["created_at"])
-                        ->setId($row["id"])
+                        ->setNewsId((int) $row["news_id"])
+                        ->setBody((string) $row["body"])
+                        ->setCreatedAt((string) $row["created_at"])
+                        ->setId((int) $row["id"])
                         ->buildExisting()
                 );
             } catch (InvalidCommentExceception $exceception) {
@@ -41,7 +42,7 @@ class CommentRepository
         return $comments;
     }
 
-    public function addCommentForNews(string $body, int $newsId): bool|string
+    public function addCommentForNews(string $body, int $newsId): int
     {
 
         try {
@@ -50,9 +51,9 @@ class CommentRepository
             $this->databaseConnection->execute(
                 $sql,
                 [
-                    $body,
-                    $currentDateTime->format("Y-m-d H:i:s"),
-                    $newsId
+                    "body" => $body,
+                    "created_at" => $currentDateTime->format("Y-m-d H:i:s"),
+                    "news_id" => $newsId
                 ],
                 [
                     "body" => ParameterTypes::TYPE_STRING,
@@ -60,7 +61,7 @@ class CommentRepository
                     "news_id" => ParameterTypes::TYPE_INT
                 ]
             );
-            return $this->databaseConnection->lastInsertId();
+            return (int) $this->databaseConnection->lastInsertId();
         } catch (\Throwable $throwable) {
             $this->logger->error($throwable->getMessage());
             return 0;
@@ -76,9 +77,10 @@ class CommentRepository
                 ["id" => $id],
                 ["id" => ParameterTypes::TYPE_INT]
             );
-            return false;
+            return true;
         } catch (\Throwable $throwable) {
             $this->logger->error($throwable->getMessage());
+            return false;
         }
     }
 
@@ -98,6 +100,10 @@ class CommentRepository
         }
     }
 
+    /**
+     * @param int $getId
+     * @return Comments<Comment>
+     */
     public function getCommentsByNewsId(int $getId): Comments
     {
         $rows = $this->databaseConnection->select(
@@ -111,10 +117,10 @@ class CommentRepository
             try {
                 $comments->append(
                     $this->commentBuilder
-                        ->setNewsId($row["news_id"])
-                        ->setBody($row["body"])
-                        ->setCreatedAt($row["created_at"])
-                        ->setId($row["id"])
+                        ->setNewsId((int) $row["news_id"])
+                        ->setBody((string) $row["body"])
+                        ->setCreatedAt((string) $row["created_at"])
+                        ->setId((int) $row["id"])
                         ->buildExisting()
                 );
             } catch (InvalidCommentExceception $exception) {
