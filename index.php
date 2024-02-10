@@ -1,7 +1,5 @@
 <?php
 
-define('ROOT', __DIR__);
-
 require_once __DIR__ . '/bootstrap.php';
 
 $kernel = new \App\Kernel();
