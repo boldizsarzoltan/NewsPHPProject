@@ -4,53 +4,52 @@ namespace App\Entities;
 
 class Comment
 {
-    protected $id, $body, $createdAt, $newsId;
+    protected int $id;
+    protected string $body;
+    protected \DateTimeInterface $createdAt;
+    protected ?int $newsId;
 
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function setBody($body)
+    public function setId(int $id): Comment
     {
-        $this->body = $body;
-
+        $this->id = $id;
         return $this;
     }
 
-    public function getBody()
+    public function getBody(): string
     {
         return $this->body;
     }
 
-    public function setCreatedAt($createdAt)
+    public function setBody(string $body): Comment
     {
-        $this->createdAt = $createdAt;
-
+        $this->body = $body;
         return $this;
     }
 
-    public function getCreatedAt()
+    public function getCreatedAt(): \DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function getNewsId()
+    public function setCreatedAt(\DateTimeInterface $createdAt): Comment
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getNewsId(): ?int
     {
         return $this->newsId;
     }
 
-    public function setNewsId($newsId)
+    public function setNewsId(int $newsId): Comment
     {
         $this->newsId = $newsId;
-
         return $this;
     }
 }

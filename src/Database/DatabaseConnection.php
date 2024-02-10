@@ -4,9 +4,9 @@ namespace App\Database;
 
 class DatabaseConnection
 {
-    private $pdo;
+    private \PDO $pdo;
 
-    private static $instance = null;
+    private static ?self $instance = null;
 
     private function __construct()
     {
@@ -18,7 +18,7 @@ class DatabaseConnection
         $this->pdo = new \PDO($dsn, $user, $password);
     }
 
-    public static function getInstance()
+    public static function getInstance(): self
     {
         if (null === self::$instance) {
             self::$instance = new self;
@@ -26,18 +26,23 @@ class DatabaseConnection
         return self::$instance;
     }
 
-    public function select($sql)
+    /**
+     * @param string $sql
+     * @return array<mixed>|false
+     */
+    public function select(string $sql): array|false
     {
         $sth = $this->pdo->query($sql);
         return $sth->fetchAll();
     }
 
-    public function exec($sql)
+    public function exec(string $sql): bool|int
     {
         return $this->pdo->exec($sql);
     }
 
-    public function lastInsertId()
+    //TODO: change bool into false in 8.2
+    public function lastInsertId(): bool|string
     {
         return $this->pdo->lastInsertId();
     }

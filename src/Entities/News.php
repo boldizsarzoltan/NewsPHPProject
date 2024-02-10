@@ -4,53 +4,52 @@ namespace App\Entities;
 
 class News
 {
-    protected $id, $title, $body, $createdAt;
+    protected int $id;
+    protected string $title;
+    protected string $body;
+    protected \DateTimeInterface $createdAt;
 
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function setTitle($title)
+    public function setId(int $id): News
     {
-        $this->title = $title;
-
+        $this->id = $id;
         return $this;
     }
 
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function setBody($body)
+    public function setTitle(string $title): News
     {
-        $this->body = $body;
-
+        $this->title = $title;
         return $this;
     }
 
-    public function getBody()
+    public function getBody(): string
     {
         return $this->body;
     }
 
-    public function setCreatedAt($createdAt)
+    public function setBody(string $body): News
     {
-        $this->createdAt = $createdAt;
-
+        $this->body = $body;
         return $this;
     }
 
-    public function getCreatedAt()
+    public function getCreatedAt(): \DateTimeInterface
     {
         return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): News
+    {
+        $this->createdAt = $createdAt;
+        return $this;
     }
 }

@@ -7,7 +7,7 @@ use App\Entities\News;
 
 final class NewsManager
 {
-    private static $instance = null;
+    private static ?self $instance = null;
 
     private function __construct()
     {
@@ -22,9 +22,10 @@ final class NewsManager
     }
 
     /**
+     * @return array<News>
      * list all news
      */
-    public function listNews()
+    public function listNews(): array
     {
         $db = DatabaseConnection::getInstance();
         $rows = $db->select('SELECT * FROM `news`');
@@ -35,7 +36,7 @@ final class NewsManager
             $news[] = $n->setId($row['id'])
                 ->setTitle($row['title'])
                 ->setBody($row['body'])
-                ->setCreatedAt($row['created_at']);
+                ->setCreatedAt(new \DateTimeImmutable($row['created_at']));
         }
 
         return $news;
@@ -44,18 +45,18 @@ final class NewsManager
     /**
      * add a record in news table
      */
-    public function addNews($title, $body)
+    public function addNews(string $title, string $body): int|bool
     {
         $db = DatabaseConnection::getInstance();
         $sql = "INSERT INTO `news` (`title`, `body`, `created_at`) VALUES('" . $title . "','" . $body . "','" . date('Y-m-d') . "')";
         $db->exec($sql);
-        return $db->lastInsertId($sql);
+        return $db->lastInsertId();
     }
 
     /**
      * deletes a news, and also linked comments
      */
-    public function deleteNews($id)
+    public function deleteNews(int $id): int|bool
     {
         $comments = CommentManager::getInstance()->listComments();
         $idsToDelete = [];
