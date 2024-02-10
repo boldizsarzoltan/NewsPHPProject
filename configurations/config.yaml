@@ -16,10 +16,12 @@ services:
             App\Repositories\CommentRepository
         arguments:
             $databaseConnection: '@App\Database\DatabaseConnectionInterface'
+            $commentBuilder: '@App\Repositories\Builder\CommentBuilder'
     App\Repositories\NewsRepository:
         class:
             App\Repositories\NewsRepository
         arguments:
             $databaseConnection: '@App\Database\DatabaseConnectionInterface'
             $commentManager: '@App\Repositories\CommentRepository'
+            $newsBuilder: '@App\Repositories\Builder\NewsBuilder'
 

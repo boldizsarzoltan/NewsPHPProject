@@ -2,18 +2,18 @@
 
 namespace App\Repositories;
 
-use App\Database\DatabaseConnection;
 use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
-use App\Entity\Comment;
+use App\Repositories\Builder\CommentBuilder;
 use App\Repositories\Exceptions\InvalidCommentExceception;
 
 class CommentRepository
 {
-    private DatabaseConnectionInterface $databaseConnection;
 
-    public function __construct(DatabaseConnectionInterface $databaseConnection) {
-        $this->databaseConnection = $databaseConnection;
+    public function __construct(
+        private DatabaseConnectionInterface $databaseConnection,
+        private CommentBuilder $commentBuilder
+    ) {
     }
 
     public function listComments()
@@ -23,7 +23,12 @@ class CommentRepository
         $comments = [];
         foreach ($rows as $row) {
             try {
-                $comments[] = $this->buildComment($row);
+                $comments[] = $this->commentBuilder
+                    ->setNewsId($row["news_id"])
+                    ->setBody($row["body"])
+                    ->setCreatedAt($row["created_at"])
+                    ->setId($row["id"])
+                    ->buildExisting();
             } catch (InvalidCommentExceception) {
             }
         }
@@ -82,20 +87,15 @@ class CommentRepository
         $comments = [];
         foreach ($rows as $row) {
             try {
-                $comments[] = $this->buildComment($row);
+                $comments[] = $this->commentBuilder
+                    ->setNewsId($row["news_id"])
+                    ->setBody($row["body"])
+                    ->setCreatedAt($row["created_at"])
+                    ->setId($row["id"])
+                    ->buildExisting();
             } catch (InvalidCommentExceception) {
             }
         }
         return $comments;
-    }
-
-    public function buildComment(array $row): Comment
-    {
-        return new Comment(
-            $row["news_id"],
-            $row["body"],
-            new \DateTimeImmutable($row["created_at"]),
-            $row["id"]
-        );
     }
 }

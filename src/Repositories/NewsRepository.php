@@ -2,22 +2,18 @@
 
 namespace App\Repositories;
 
-use App\Database\DatabaseConnection;
 use App\Database\DatabaseConnectionInterface;
 use App\Database\ParameterTypes;
 use App\Entity\News;
+use App\Repositories\Builder\NewsBuilder;
 
 final class NewsRepository
 {
-    private DatabaseConnectionInterface $databaseConnection;
-    private CommentRepository $commentManager;
-
     public function __construct(
-        DatabaseConnectionInterface $databaseConnection,
-        CommentRepository $commentManager
+        private readonly DatabaseConnectionInterface $databaseConnection,
+        private readonly CommentRepository $commentManager,
+        private readonly NewsBuilder $newsBuilder
     ) {
-        $this->databaseConnection = $databaseConnection;
-        $this->commentManager = $commentManager;
     }
 
     /**
@@ -29,7 +25,12 @@ final class NewsRepository
         $rows = $this->databaseConnection->select('SELECT * FROM `news`');
         $news = [];
         foreach ($rows as $row) {
-            $news[] = $this->createNews($row);
+            $news[] = $this->newsBuilder
+                ->setBody($row["body"])
+                ->setCreatedAt($row["created_at"])
+                ->setTitle($row["title"])
+                ->setId($row["id"])
+                ->buildExisting();
         }
 
         return $news;
@@ -71,16 +72,6 @@ final class NewsRepository
             $sql,
             ["id" => $id],
             ["id" => ParameterTypes::TYPE_INT]
-        );
-    }
-
-    public function createNews(array $row): News
-    {
-        return new News(
-            $row['title'],
-            $row['body'],
-            new \DateTimeImmutable($row['created_at']),
-            $row['id']
         );
     }
 }
